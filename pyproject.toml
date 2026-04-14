@@ -1,7 +1,14 @@
 [project]
 name = "boolish-website"
 version = "0.1.0"
-description = "Add your description here"
+description = "Site de utilidades ad hoc com FastAPI"
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = []
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.116.1",
+    "folium>=0.20.0",
+    "openpyxl>=3.1.5",
+    "pygeohash>=3.2.0",
+    "shapely>=2.1.2",
+    "uvicorn[standard]>=0.35.0",
+]
