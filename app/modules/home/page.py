@@ -110,6 +110,22 @@ def render_home_page() -> str:
       color: var(--ink);
       font-weight: 600;
     }
+    .query-box {
+      margin-top: 12px;
+      display: none;
+    }
+    .query-box textarea {
+      min-height: 90px;
+    }
+    .copy-btn {
+      margin-top: 8px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: white;
+      padding: 8px 10px;
+      cursor: pointer;
+      font-weight: 600;
+    }
     iframe {
       width: 100%;
       min-height: 560px;
@@ -161,6 +177,11 @@ def render_home_page() -> str:
         </div>
         <iframe id="mapFrame" title="Mapa de geohashes"></iframe>
       </div>
+      <div id="queryBox" class="query-box">
+        <label for="geohashQueryOutput">Geohashes para query (copiar e colar)</label>
+        <textarea id="geohashQueryOutput" readonly></textarea>
+        <button id="copyGeohashesBtn" class="copy-btn" type="button">Copiar geohashes</button>
+      </div>
     </section>
 
     <section id="coming-soon" class="tab-panel">
@@ -189,12 +210,31 @@ def render_home_page() -> str:
     const mapLink = document.getElementById('mapLink');
     const xlsxLink = document.getElementById('xlsxLink');
     const mapFrame = document.getElementById('mapFrame');
+    const queryBoxEl = document.getElementById('queryBox');
+    const geohashQueryOutputEl = document.getElementById('geohashQueryOutput');
+    const copyGeohashesBtn = document.getElementById('copyGeohashesBtn');
+
+    copyGeohashesBtn.addEventListener('click', async () => {
+      const text = geohashQueryOutputEl.value;
+      if (!text) return;
+
+      try {
+        await navigator.clipboard.writeText(text);
+        copyGeohashesBtn.textContent = 'Copiado';
+        setTimeout(() => { copyGeohashesBtn.textContent = 'Copiar geohashes'; }, 1200);
+      } catch (_) {
+        geohashQueryOutputEl.select();
+        document.execCommand('copy');
+      }
+    });
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       statusEl.textContent = 'Processando...';
       statusEl.className = 'status';
       resultsEl.style.display = 'none';
+      queryBoxEl.style.display = 'none';
+      geohashQueryOutputEl.value = '';
       submitBtn.disabled = true;
 
       const payload = {
@@ -226,12 +266,15 @@ def render_home_page() -> str:
           <strong>Rings detectados:</strong> ${data.rings_count}<br/>
           <strong>Stats por tamanho:</strong> ${JSON.stringify(data.stats_by_length)}
         `;
+        geohashQueryOutputEl.value = data.geohashes.map((geohash) => `'${geohash}'`).join(', ');
 
         statusEl.textContent = 'Concluido.';
         resultsEl.style.display = 'block';
+        queryBoxEl.style.display = 'block';
       } catch (error) {
         statusEl.textContent = error.message;
         statusEl.className = 'status error';
+        queryBoxEl.style.display = 'none';
       } finally {
         submitBtn.disabled = false;
       }

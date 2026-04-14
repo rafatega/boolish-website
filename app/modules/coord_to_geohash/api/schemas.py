@@ -12,5 +12,6 @@ class CoordToGeohashRunRequest(BaseModel):
 class CoordToGeohashRunResponse(BaseModel):
     run_id: str
     geohash_count: int
+    geohashes: list[str]
     stats_by_length: dict[int, int]
     rings_count: int

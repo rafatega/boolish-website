@@ -44,6 +44,7 @@ def _run_coord_to_geohash(raw_coords: str, target_precision: int, max_outside: f
     return CoordToGeohashRunResponse(
         run_id=run_id,
         geohash_count=output.geohash_count,
+        geohashes=output.geohashes,
         stats_by_length=output.stats_by_length,
         rings_count=output.rings_count,
     )
